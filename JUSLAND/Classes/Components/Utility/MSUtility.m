@@ -1,0 +1,172 @@
+//
+//  MSUtility.m
+//  MIS
+//
+//  Created by LIUZHEN on 2016/12/11.
+//  Copyright © 2016年 58. All rights reserved.
+//
+
+#import "MSUtility.h"
+#import "sys/utsname.h"
+#import <SAMKeychain/SAMKeychain.h>
+
+@implementation MSUtility
+
++ (CGFloat)avatarRadius:(CGSize)size {
+    return size.width * 0.5f;
+}
+
+//+ (void)setAvatar:(UIImageView *)imageView forUser:(MSUser *)user {
+//    //    __weak typeof(imageView) weakImageView = imageView;
+//    if (user.gender == MSGenderFemale) {
+//        [imageView sd_setImageWithURL:[NSURL URLWithString:user.avatar]
+//                     placeholderImage:[UIImage imageNamed:@"Avatar_Female_Online"]
+//                            completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//                                if (!user.state) {
+//                                    //                                    if (weakImageView.layer.sublayers == 0) {
+//                                    //                                        CALayer *layer = [CALayer layer];
+//                                    //                                        layer.bounds = (CGRect){CGPointZero, image.size};
+//                                    //                                        layer.backgroundColor = [UIColor colorWithHexString:@"#000000" colorAlpha:0.5f].CGColor;
+//                                    //                                        [weakImageView.layer addSublayer:layer];
+//                                    //                                    }
+//                                    //                                    weakImageView.image = [image imageWithTintColor:nil];
+//                                }
+//                            }];
+//    } else {
+//        [imageView sd_setImageWithURL:[NSURL URLWithString:user.avatar]
+//                     placeholderImage:[UIImage imageNamed:@"Avatar_Male_online"]
+//                            completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//                                if (!user.state) {
+//                                    //                                    if (weakImageView.layer.sublayers == 0) {
+//                                    //                                        CALayer *layer = [CALayer layer];
+//                                    //                                        layer.bounds = (CGRect){CGPointZero, image.size};
+//                                    //                                        layer.backgroundColor = [UIColor colorWithHexString:@"#000000" colorAlpha:0.5f].CGColor;
+//                                    //                                        [weakImageView.layer addSublayer:layer];
+//                                    //                                    }
+//                                    //                                    weakImageView.image = [image imageWithTintColor:nil];
+//                                }
+//                            }];
+//    }
+//}
+
++ (NSString *)UUID {
+    // 从钥匙串中获取UUID
+    NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
+    NSString *account = [NSString stringWithFormat:@"%@-UUID", bundleId];
+    NSString * UUID = [SAMKeychain passwordForService:bundleId account:account];
+    
+    // 没获取到，生成一个UUID，并保存到钥匙串中，保证应用被卸载后重新安装使用的还是同一个UUID
+    if (UUID == nil) {
+        CFUUIDRef uuidRef = CFUUIDCreate(NULL);
+        CFStringRef string = CFUUIDCreateString(NULL, uuidRef);
+        CFRelease(uuidRef);
+        UUID = (__bridge_transfer NSString *)string;
+        [SAMKeychain setPassword:UUID forService:bundleId account:bundleId];
+    }
+    return UUID;
+}
+
++ (NSString *)deviceModel {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    
+    //iPhone
+    if ([deviceString isEqualToString:@"iPhone1,1"])    return @"iPhone 1G";
+    if ([deviceString isEqualToString:@"iPhone1,2"])    return @"iPhone 3G";
+    if ([deviceString isEqualToString:@"iPhone2,1"])    return @"iPhone 3GS";
+    if ([deviceString isEqualToString:@"iPhone3,1"])    return @"iPhone 4";
+    if ([deviceString isEqualToString:@"iPhone3,2"])    return @"Verizon iPhone 4";
+    if ([deviceString isEqualToString:@"iPhone4,1"])    return @"iPhone 4S";
+    if ([deviceString isEqualToString:@"iPhone5,1"])    return @"iPhone 5";
+    if ([deviceString isEqualToString:@"iPhone5,2"])    return @"iPhone 5";
+    if ([deviceString isEqualToString:@"iPhone5,3"])    return @"iPhone 5C";
+    if ([deviceString isEqualToString:@"iPhone5,4"])    return @"iPhone 5C";
+    if ([deviceString isEqualToString:@"iPhone6,1"])    return @"iPhone 5S";
+    if ([deviceString isEqualToString:@"iPhone6,2"])    return @"iPhone 5S";
+    if ([deviceString isEqualToString:@"iPhone7,1"])    return @"iPhone 6 Plus";
+    if ([deviceString isEqualToString:@"iPhone7,2"])    return @"iPhone 6";
+    if ([deviceString isEqualToString:@"iPhone8,1"])    return @"iPhone 6s";
+    if ([deviceString isEqualToString:@"iPhone8,2"])    return @"iPhone 6s Plus";
+    if ([deviceString isEqualToString:@"iPhone9,1"])    return @"iPhone 7";
+    if ([deviceString isEqualToString:@"iPhone9,2"])    return @"iPhone 7 Plus";
+    
+    //iPod
+    if ([deviceString isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
+    if ([deviceString isEqualToString:@"iPod2,1"])      return @"iPod Touch 2G";
+    if ([deviceString isEqualToString:@"iPod3,1"])      return @"iPod Touch 3G";
+    if ([deviceString isEqualToString:@"iPod4,1"])      return @"iPod Touch 4G";
+    if ([deviceString isEqualToString:@"iPod5,1"])      return @"iPod Touch 5G";
+    
+    //iPad
+    if ([deviceString isEqualToString:@"iPad1,1"])      return @"iPad";
+    if ([deviceString isEqualToString:@"iPad2,1"])      return @"iPad 2 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad2,2"])      return @"iPad 2 (GSM)";
+    if ([deviceString isEqualToString:@"iPad2,3"])      return @"iPad 2 (CDMA)";
+    if ([deviceString isEqualToString:@"iPad2,4"])      return @"iPad 2 (32nm)";
+    if ([deviceString isEqualToString:@"iPad2,5"])      return @"iPad mini (WiFi)";
+    if ([deviceString isEqualToString:@"iPad2,6"])      return @"iPad mini (GSM)";
+    if ([deviceString isEqualToString:@"iPad2,7"])      return @"iPad mini (CDMA)";
+    
+    if ([deviceString isEqualToString:@"iPad3,1"])      return @"iPad 3 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad3,2"])      return @"iPad 3 (CDMA)";
+    if ([deviceString isEqualToString:@"iPad3,3"])      return @"iPad 3 (4G)";
+    if ([deviceString isEqualToString:@"iPad3,4"])      return @"iPad 4 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad3,5"])      return @"iPad 4 (4G)";
+    if ([deviceString isEqualToString:@"iPad3,6"])      return @"iPad 4 (CDMA)";
+    
+    if ([deviceString isEqualToString:@"iPad4,1"])      return @"iPad Air";
+    if ([deviceString isEqualToString:@"iPad4,2"])      return @"iPad Air";
+    if ([deviceString isEqualToString:@"iPad4,3"])      return @"iPad Air";
+    if ([deviceString isEqualToString:@"iPad5,3"])      return @"iPad Air 2";
+    if ([deviceString isEqualToString:@"iPad5,4"])      return @"iPad Air 2";
+    if ([deviceString isEqualToString:@"i386"])         return @"Simulator";
+    if ([deviceString isEqualToString:@"x86_64"])       return @"Simulator";
+    
+    if ([deviceString isEqualToString:@"iPad4,4"]
+        ||[deviceString isEqualToString:@"iPad4,5"]
+        ||[deviceString isEqualToString:@"iPad4,6"])      return @"iPad mini 2";
+    
+    if ([deviceString isEqualToString:@"iPad4,7"]
+        ||[deviceString isEqualToString:@"iPad4,8"]
+        ||[deviceString isEqualToString:@"iPad4,9"])      return @"iPad mini 3";
+    
+    return deviceString;
+}
+
++ (MSNetworkReachabilityStatus)currentNetWorkStates {
+    UIApplication *app = [UIApplication sharedApplication];
+    NSArray *children = [[[app valueForKeyPath:@"statusBar"] valueForKeyPath:@"foregroundView"] subviews];
+    MSNetworkReachabilityStatus state = MSNetworkReachabilityStatusUnknown;
+    int netType = 0;
+    // 获取到网络返回码
+    for (id child in children) {
+        if ([child isKindOfClass:NSClassFromString(@"UIStatusBarDataNetworkItemView")]) {
+            // 获取到状态栏
+            netType = [[child valueForKeyPath:@"dataNetworkType"] intValue];
+            switch (netType) {
+                case 0:
+                    state = MSNetworkReachabilityStatusNotReachable;
+                    break;
+                case 1:
+                    state = MSNetworkReachabilityStatusWWAN2G;
+                    break;
+                case 2:
+                    state = MSNetworkReachabilityStatusWWAN3G;
+                    break;
+                case 3:
+                    state = MSNetworkReachabilityStatusWWAN4G;
+                    break;
+                case 5:
+                    state = MSNetworkReachabilityStatusWiFi;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    //根据状态选择
+    return state;
+}
+
+@end

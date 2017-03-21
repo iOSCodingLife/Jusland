@@ -1,0 +1,6 @@
+framework module Pods_JUSLAND {
+  umbrella header "Pods-JUSLAND-umbrella.h"
+
+  export *
+  module * { export * }
+}
